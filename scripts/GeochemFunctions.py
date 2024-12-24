@@ -2,6 +2,7 @@
 from itertools import combinations
 import pandas as pd
 import math
+import numpy as np
 
 # ==========================================================
 # make ratios between every column of a dataframe and every other, then append onto orininal
@@ -103,3 +104,21 @@ def find(lst, array, a):
     return result
     
 
+# ==========================================================
+
+
+#https://stackoverflow.com/questions/20230384/find-indexes-of-matching-rows-in-two-2-d-arrays
+def find_rows(a, b):
+    dt = np.dtype((np.void, a.dtype.itemsize * a.shape[1]))
+
+    a_view = np.ascontiguousarray(a).view(dt).ravel()
+    b_view = np.ascontiguousarray(b).view(dt).ravel()
+
+    sort_b = np.argsort(b_view)
+    where_in_b = np.searchsorted(b_view, a_view,
+                                 sorter=sort_b)
+    where_in_b = np.take(sort_b, where_in_b)
+    which_in_a = np.take(b_view, where_in_b) == a_view
+    where_in_b = where_in_b[which_in_a]
+    which_in_a = np.nonzero(which_in_a)[0]
+    return np.column_stack((which_in_a, where_in_b))

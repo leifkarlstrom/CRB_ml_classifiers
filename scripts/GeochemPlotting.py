@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import pandas as pd
 import matplotlib.cm as cm
 import numpy as np
@@ -140,4 +141,126 @@ def plot_single_classification(data,labels,fig,ax,centerlabel,text,lowerLimit):
     ax.set_xticklabels([])
     ax.set_yticks([])#0,.25, .5, .75, 1])
 
+# ==========================================================
+    
 
+def scatter_hist(x, y, ax, ax_histx, ax_histy,nbins,labels):
+    # no labels
+    ax_histx.tick_params(axis="x", labelbottom=False)
+    ax_histy.tick_params(axis="y", labelleft=False)
+
+    # the scatter plot:
+    ax.scatter(x, y,s=150)
+    ax.set_ylabel('Known Sample Labels', fontsize=18);
+    ax.set_xlabel('Unsupervised Cluster Labels', fontsize=18);
+    
+    ax.set_yticks(range(int(np.amax(y))+1))
+    ax.set_ylim([-0.5,np.amax(y)+.5])
+    ax.set_xticks(range(int(np.amax(x))))
+    ax.set_xlim([-0.5,np.amax(x)+.5])
+    
+    ax.grid()
+    ax.tick_params(axis='both', labelsize=15)
+    #plt.title(n_cluster, fontsize=12)
+    #ax.set_xticks(fontsize=12)
+    #ax.set_yticks(fontsize=12)
+    
+    #set the y tick labels from data
+    ax.set_yticklabels(labels)    
+
+    # now determine nice limits by hand:
+    binwidth = 0.4
+    xymax = max(np.max(np.abs(x)), np.max(np.abs(y)))
+    lim = (int(xymax/binwidth) + 1) * binwidth
+
+    bins = np.arange(0, lim + binwidth, binwidth)
+    ax_histx.hist(x, bins=nbins,color = "lightsteelblue")
+    ax_histy.hist(y, bins=nbins, orientation='horizontal',color = "salmon")
+    
+    ax_histx.set_ylabel('# samples', fontsize=18);
+    ax_histx.tick_params(axis='both', labelsize=15)
+    ax_histy.set_xlabel('# samples', fontsize=18);
+    ax_histy.tick_params(axis='both', labelsize=15)    
+    
+ # ==========================================================
+
+
+def pcolor_hist(array, ax, ax_histx, ax_histy,nbins,labels):
+    # no labels
+    ax_histx.tick_params(axis="x", labelbottom=False)
+    ax_histy.tick_params(axis="y", labelleft=False)
+
+    #generate binary array of input
+    binary_array = np.zeros(np.shape(array))
+    binary_array[array != 0] = 1
+    
+    #project on either side and make binary
+    x = np.sum(array,axis=1) #sum to get row vector
+    y = np.sum(array,axis=0) #sum to get column
+    
+    #normalize along columns
+    array = array / np.max(array, axis=0) 
+    
+    # the scatter plot:
+    #ax.pcolor(binary_array,cmap='binary')
+    ax.pcolor(array,cmap='binary')
+    
+    # Set the color limits to make the nonzero points gray
+    #plt.clim(0, 1)
+    
+    ax.set_ylabel('Known Sample Labels', fontsize=18);
+    ax.set_xlabel('Unsupervised Cluster Labels', fontsize=18);
+    
+    ax.set_xticks(np.arange(binary_array.shape[1]) + 0.5, minor=False)
+    ax.set_yticks(np.arange(binary_array.shape[0]) + 0.5, minor=False)
+    ax.set_xticklabels(np.arange(binary_array.shape[1]))
+    #ax.set_yticklabels(np.arange(binary_array.shape[0])
+
+    # ax.set_yticks(range(len(y)))
+    #ax.set_ylim([-0.5,len(y)+.5])
+    # ax.set_xticks(range(len(x)))
+    #ax.set_xlim([-0.5,len(x)+.5])
+    ax.set_xlim([0,len(y)])
+    
+    ax.set_ylim([0,len(x)])
+    
+    ax.grid()
+    ax.tick_params(axis='both', labelsize=15)
+    #plt.title(n_cluster, fontsize=12)
+    #ax.set_xticks(fontsize=12)
+    #ax.set_yticks(fontsize=12)
+    
+    #set the y tick labels from data
+    ax.set_yticklabels(labels)    
+    ax.minorticks_on()  # Turn on minor ticks
+    ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.5))
+    ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.5))
+    
+    # Set grid lines for minor ticks only
+    ax.grid(which='minor', linestyle='-', linewidth=0.5)
+
+    # Turn off grid lines for major ticks
+    ax.grid(which='major', linestyle='None')
+
+    # now determine nice limits by hand:
+    binwidth = 0.4
+    xymax = max(np.max(np.abs(x)), np.max(np.abs(y)))
+    lim = (int(xymax/binwidth) + 1) * binwidth
+
+    bins = np.arange(0, lim + binwidth, binwidth)
+    ax_histx.bar(np.arange(len(y))+.5,y, color = "lightsteelblue")
+    ax_histy.barh(np.arange(len(x))+.5,x, color = "salmon")
+    #ax_histx.hist(x, bins=nbins,color = "lightsteelblue")
+    #ax_histy.hist(y, bins=nbins, orientation='horizontal',color = "salmon")
+    
+    ax_histx.set_ylabel('# samples', fontsize=18);
+    ax_histx.tick_params(axis='both', labelsize=15)
+    ax_histy.set_xlabel('# samples', fontsize=18);
+    ax_histy.tick_params(axis='both', labelsize=15)    
+
+
+    
+    
+    
+
+    
