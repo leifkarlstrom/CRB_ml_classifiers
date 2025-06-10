@@ -49,8 +49,10 @@ def normalizedata(df,method):
         dfi= MinMaxScaler().fit_transform(df)
         dfo =pd.DataFrame(dfi)
     elif method == 'powert':
-        dfi= PowerTransformer().fit_transform(df)
-        dfo =pd.DataFrame(dfi, columns=df.columns)        
+        power_transformer = PowerTransformer(method='box-cox') 
+        dfo = pd.DataFrame(power_transformer.fit_transform(df), columns=df.columns)
+        #dfi= PowerTransformer().fit_transform(df)
+        #dfo =pd.DataFrame(dfi, columns=df.columns)        
     elif method == 'normalize':
         dfi= Normalizer().fit_transform(df)
         dfo =pd.DataFrame(dfi)

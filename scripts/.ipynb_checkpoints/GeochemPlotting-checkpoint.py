@@ -199,11 +199,32 @@ def pcolor_hist(array, ax, ax_histx, ax_histy,nbins,labels):
     y = np.sum(array,axis=0) #sum to get column
     
     #normalize along columns
-    array = array / np.max(array, axis=0) 
+    array2 = array / np.max(array, axis=0) 
+    
+    # mask some 'bad' data, in your case you would have: data == 0
+    #array2 = np.ma.masked_where(array2 == 0, array2)
     
     # the scatter plot:
     #ax.pcolor(binary_array,cmap='binary')
-    ax.pcolor(array,cmap='binary')
+    # for mpl 3.3 and higher use
+    Cmap = plt.cm.binary#cm.OrRd
+    Cmap.set_under(color='lightyellow')
+    #Cmap.set_bad(color='black')
+    
+    ax.pcolor(array2,cmap=Cmap,vmin=0.0000001)#cmap='binary')
+
+    # Annotate each cell with the numeric value, but only the largest in each column
+    for yi in range(array.shape[0]):
+        for xi in range(array.shape[1]):
+            AN = array[yi, xi]/np.sum(array,axis=0)[xi] #normalize
+            if array2[yi, xi]>=0.7:
+                ax.text(xi + 0.5, yi + 0.5, '%.2f' % AN,
+                         horizontalalignment='center',
+                         verticalalignment='center',color='white')
+            elif array2[yi, xi]>0:
+                ax.text(xi + 0.5, yi + 0.5, '%.2f' % AN,
+                         horizontalalignment='center',
+                         verticalalignment='center',color='black')    
     
     # Set the color limits to make the nonzero points gray
     #plt.clim(0, 1)
